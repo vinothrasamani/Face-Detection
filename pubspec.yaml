@@ -39,6 +39,7 @@ dependencies:
   path_provider: 
   sqflite:
   tflite_flutter: ^0.10.3
+  google_fonts:
 
 dev_dependencies:
   flutter_test:
