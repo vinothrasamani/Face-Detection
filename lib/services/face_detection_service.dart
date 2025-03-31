@@ -6,6 +6,8 @@ class FaceDetectionService {
     options: FaceDetectorOptions(
       enableClassification: true,
       performanceMode: FaceDetectorMode.accurate,
+      enableLandmarks: true,
+      enableContours: true,
     ),
   );
 
@@ -24,9 +26,6 @@ class FaceDetectionService {
       face.smilingProbability ?? 0.0,
       face.leftEyeOpenProbability ?? 0.0,
       face.rightEyeOpenProbability ?? 0.0,
-      face.headEulerAngleX ?? 0.0,
-      face.headEulerAngleY ?? 0.0,
-      face.headEulerAngleZ ?? 0.0,
     ];
   }
 }
