@@ -1,9 +1,9 @@
 import 'package:image_picker/image_picker.dart';
 
 class CameraService {
-  ImagePicker _controller = ImagePicker();
+  final picker = ImagePicker();
 
   Future<XFile?> captureImage() async {
-    return await _controller.pickImage(source: ImageSource.camera);
+    return await picker.pickImage(source: ImageSource.camera);
   }
 }

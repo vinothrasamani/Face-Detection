@@ -3,7 +3,10 @@ import 'dart:io';
 
 class FaceDetectionService {
   final FaceDetector _faceDetector = FaceDetector(
-    options: FaceDetectorOptions(enableClassification: true),
+    options: FaceDetectorOptions(
+      enableClassification: true,
+      performanceMode: FaceDetectorMode.accurate,
+    ),
   );
 
   Future<List<double>> detectFace(File imageFile) async {
