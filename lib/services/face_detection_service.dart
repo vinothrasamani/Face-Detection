@@ -23,7 +23,10 @@ class FaceDetectionService {
     return [
       face.smilingProbability ?? 0.0,
       face.leftEyeOpenProbability ?? 0.0,
-      face.rightEyeOpenProbability ?? 0.0
+      face.rightEyeOpenProbability ?? 0.0,
+      face.headEulerAngleX ?? 0.0,
+      face.headEulerAngleY ?? 0.0,
+      face.headEulerAngleZ ?? 0.0,
     ];
   }
 }
