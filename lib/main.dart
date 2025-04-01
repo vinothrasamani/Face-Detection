@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Color baseColor = const Color.fromARGB(255, 0, 118, 122);
     return MaterialApp(
-      title: 'Face Detector',
+      title: 'Smart Examiner',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: baseColor),

@@ -7,13 +7,9 @@ class Logo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      backgroundColor: const Color.fromARGB(255, 0, 38, 255),
+      backgroundImage: NetworkImage(
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYPRAbTxfmdV_jIUYxjbtjz1iv8gqDsv4Jsg&s'),
       radius: radius,
-      child: Icon(
-        Icons.play_circle_fill,
-        size: radius * 1.5,
-        color: const Color.fromARGB(255, 209, 255, 176),
-      ),
     );
   }
 }
