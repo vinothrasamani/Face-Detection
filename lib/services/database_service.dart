@@ -12,7 +12,7 @@ class DatabaseService {
 
   Future<Database> initDatabase() async {
     final directory = await getApplicationDocumentsDirectory();
-    final path = join(directory.path, 'faces.db');
+    final path = join(directory.path, 'examiner.db');
 
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute(
@@ -21,13 +21,13 @@ class DatabaseService {
     });
   }
 
-  Future<void> saveFace(String name, List<double> embedding) async {
+  Future<void> insertData(String tableName, Map<String, dynamic> data) async {
     final db = await database;
-    await db.insert("faces", {"name": name, "embedding": embedding.join(",")});
+    await db.insert(tableName, data);
   }
 
-  Future<List<Map<String, dynamic>>> getStoredFaces() async {
+  Future<List<Map<String, dynamic>>> getStoredFaces(String tableName) async {
     final db = await database;
-    return await db.query("faces");
+    return await db.query(tableName);
   }
 }

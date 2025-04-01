@@ -1,7 +1,13 @@
+import 'package:face_detection/controller/getx/theme_controller.dart';
+import 'package:face_detection/controller/getx/user_controller.dart';
+import 'package:face_detection/data/local_data.dart';
+import 'package:face_detection/screens/login_screen.dart';
+import 'package:face_detection/screens/mcq_screen.dart';
 import 'package:face_detection/widgets/logo.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:face_detection/controller/app_controller.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/camera_service.dart';
 import '../../services/face_detection_service.dart';
@@ -18,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final CameraService _cameraService = CameraService();
   final FaceDetectionService _faceDetectionService = FaceDetectionService();
   final DatabaseService _databaseService = DatabaseService();
+  List<Map<String, dynamic>> storedFaces = [];
 
   TextStyle style = TextStyle(
     fontWeight: FontWeight.bold,
@@ -35,13 +42,28 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    await _databaseService.saveFace("User", faceEmbedding);
+    await _databaseService.insertData("faces", {
+      "name": '${Get.put(UserController()).username}',
+      "embedding": faceEmbedding.join(",")
+    });
     AppController.snackBar(context, '✌️ Face added Successfully!');
+  }
+
+  Future<void> getStoredFaces() async {
+    storedFaces = await _databaseService.getStoredFaces("faces");
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getStoredFaces();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final ThemeController themeController = Get.put(ThemeController());
     return Scaffold(
       appBar: AppBar(
         title: Text('Smart Examiner!'),
@@ -49,6 +71,41 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.all(8.0),
           child: Logo(radius: 20),
         ),
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                height: 40,
+                onTap: () {
+                  themeController.changeTheme();
+                },
+                child: Row(
+                  children: [
+                    Icon(Icons.dark_mode),
+                    SizedBox(width: 4),
+                    Text('Dark Mode'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
+                onTap: () {
+                  Get.offAll(() => LoginScreen());
+                },
+                height: 40,
+                child: Row(
+                  children: [
+                    Icon(Icons.logout),
+                    SizedBox(width: 4),
+                    Text('Logout'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -56,6 +113,19 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SizedBox(height: 15),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  'Welcome ${Get.put(UserController()).username}!',
+                  style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: themeController.isDark.value
+                          ? Colors.white
+                          : Theme.of(context).primaryColor),
+                ),
+              ),
               SizedBox(height: 20),
               Text(
                 'Test your Knowledge',
@@ -73,8 +143,12 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Choose the besst option', style: style),
+                  onPressed: () {
+                    Get.to(() => McqScreen(
+                          questions: LocalData.mcq,
+                        ));
+                  },
+                  child: Text('Choose the correct answer', style: style),
                 ),
               ),
               SizedBox(height: 15),
@@ -98,10 +172,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => registerFace(context),
-        child: Icon(Icons.camera_alt),
-      ),
+      floatingActionButton: storedFaces.isEmpty
+          ? FloatingActionButton(
+              tooltip: 'Add Face to Autheenticate',
+              onPressed: () => registerFace(context),
+              child: Icon(Icons.camera_alt),
+            )
+          : null,
     );
   }
 }

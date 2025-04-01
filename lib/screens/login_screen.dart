@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:face_detection/controller/app_controller.dart';
+import 'package:face_detection/controller/getx/user_controller.dart';
 import 'package:face_detection/screens/home_screen.dart';
 import 'package:face_detection/widgets/logo.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import '../../services/camera_service.dart';
 import '../../services/face_detection_service.dart';
 import '../../services/database_service.dart';
@@ -22,7 +26,9 @@ class _HomeState extends State<LoginScreen> {
   final DatabaseService _databaseService = DatabaseService();
   final FaceAuthService _faceAuthService = FaceAuthService();
   final _formKey = GlobalKey<FormState>();
-  bool canShow = false;
+  List<Map<String, dynamic>> storedFaces = [];
+  bool canShow = false, islogin = true;
+  String? username, password;
 
   Future<void> authenticateUser(context) async {
     final image = await _cameraService.captureImage();
@@ -36,7 +42,6 @@ class _HomeState extends State<LoginScreen> {
       return;
     }
 
-    final storedFaces = await _databaseService.getStoredFaces();
     for (var face in storedFaces) {
       final storedEmbedding =
           face["embedding"].split(",").map(double.parse).toList();
@@ -44,10 +49,8 @@ class _HomeState extends State<LoginScreen> {
           _faceAuthService.compareEmbeddings(currentEmbedding, storedEmbedding);
 
       if (similarity > 0.8) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (ctx) => HomeScreen()),
-        );
+        Get.put(UserController()).getUsername(face['name']);
+        Get.off(() => HomeScreen());
         AppController.snackBar(context, '✌️ Login Successfully!');
         return;
       }
@@ -57,10 +60,44 @@ class _HomeState extends State<LoginScreen> {
         purpose: Purpose.failure);
   }
 
+  Future<void> getStoredFaces() async {
+    storedFaces = await _databaseService.getStoredFaces("faces");
+    setState(() {});
+  }
+
+  void process() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final res =
+          await AppController.postRequest(islogin ? 'login' : 'register', {
+        "name": username,
+        "password": password,
+      });
+      if (res == null) {
+        AppController.snackBar(context, '🙅‍♂️ Something went wrong!',
+            purpose: Purpose.failure);
+        return;
+      } else {
+        final result = jsonDecode(res);
+        if (result['success']) {
+          Get.put(UserController()).getUsername(username!);
+          Get.off(() => HomeScreen());
+          AppController.snackBar(context,
+              islogin ? 'Login Successfully!' : 'Registered Successfully!');
+        } else {
+          AppController.snackBar(context, result['message'],
+              purpose: Purpose.failure);
+          return;
+        }
+      }
+    }
+  }
+
   @override
   void initState() {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    getStoredFaces();
     super.initState();
   }
 
@@ -75,7 +112,7 @@ class _HomeState extends State<LoginScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sign In"),
+        title: Text(islogin ? "Sign In" : "Sign Up"),
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Logo(radius: 20),
@@ -98,7 +135,7 @@ class _HomeState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Welcome Back!",
+                      islogin ? "Welcome Back!" : "Create an account!",
                       style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(height: 10),
@@ -112,6 +149,9 @@ class _HomeState extends State<LoginScreen> {
                           return 'Please enter your username';
                         }
                         return null;
+                      },
+                      onSaved: (newValue) {
+                        username = newValue;
                       },
                     ),
                     SizedBox(height: 10),
@@ -139,48 +179,73 @@ class _HomeState extends State<LoginScreen> {
                         }
                         return null;
                       },
+                      onSaved: (newValue) {
+                        password = newValue;
+                      },
                     ),
                     SizedBox(height: 15),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (ctx) => HomeScreen()),
-                            );
-                            AppController.snackBar(
-                                context, 'Login Successfully!');
-                          }
-                        },
+                        onPressed: process,
                         child: Text(
-                          "Login",
+                          islogin ? "Login" : "Sign Up",
                           style: TextStyle(
                               fontSize: 15, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
-                    Row(
-                      children: [
-                        Expanded(child: Divider()),
-                        Text(' OR '),
-                        Expanded(child: Divider()),
-                      ],
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          authenticateUser(context);
-                        },
-                        child: Text(
-                          "Login with Face",
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
-                        ),
+                    SizedBox(height: 10),
+                    Text.rich(
+                      TextSpan(
+                        text: islogin
+                            ? 'Don\'t have an account? '
+                            : 'Already have an account? ',
+                        children: [
+                          TextSpan(
+                            text: islogin ? 'Sign Up' : 'Login',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                setState(() {
+                                  islogin = !islogin;
+                                });
+                              },
+                          ),
+                        ],
                       ),
                     ),
+                    SizedBox(height: 10),
+                    storedFaces.isNotEmpty && islogin
+                        ? Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(child: Divider()),
+                                  Text(' OR '),
+                                  Expanded(child: Divider()),
+                                ],
+                              ),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    authenticateUser(context);
+                                  },
+                                  child: Text(
+                                    "Login with Face",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(''),
                   ],
                 ),
               ),
