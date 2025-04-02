@@ -30,6 +30,12 @@ class AppController {
     );
   }
 
+  static List<String> suffle(List<String> list) {
+    List<String> shuffledList = List.from(list);
+    shuffledList.shuffle();
+    return shuffledList;
+  }
+
   static Future<dynamic> postRequest(String endpoint, dynamic body) async {
     final header = {
       "Content-Type": "application/json",

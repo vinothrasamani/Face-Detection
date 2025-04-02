@@ -2,6 +2,7 @@ import 'package:face_detection/controller/getx/theme_controller.dart';
 import 'package:face_detection/controller/getx/user_controller.dart';
 import 'package:face_detection/data/local_data.dart';
 import 'package:face_detection/screens/login_screen.dart';
+import 'package:face_detection/screens/match_screen.dart';
 import 'package:face_detection/screens/mcq_screen.dart';
 import 'package:face_detection/widgets/logo.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: Row(
                   children: [
-                    Icon(Icons.dark_mode),
+                    Icon(
+                      Icons.dark_mode,
+                      color: Colors.grey,
+                    ),
                     SizedBox(width: 4),
                     Text('Dark Mode'),
                   ],
@@ -96,7 +100,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 40,
                 child: Row(
                   children: [
-                    Icon(Icons.logout),
+                    Icon(
+                      Icons.logout,
+                      color: Colors.grey,
+                    ),
                     SizedBox(width: 4),
                     Text('Logout'),
                   ],
@@ -155,7 +162,11 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => MatchScreen(
+                          list: LocalData.mtf,
+                        ));
+                  },
                   child: Text('Match the followings', style: style),
                 ),
               ),

@@ -48,7 +48,7 @@ class LocalData {
         'Photosynthesis',
         'Shakespeare',
         'Eiffel Tower',
-        ' Pacific Ocean',
+        'Pacific Ocean',
         'Paris'
       ],
       'ans': [

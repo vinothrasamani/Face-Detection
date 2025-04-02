@@ -1,7 +1,9 @@
+import 'package:face_detection/controller/app_controller.dart';
 import 'package:face_detection/controller/getx/theme_controller.dart';
 import 'package:face_detection/controller/getx/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 //---------------method 2------------------
 // import 'package:google_fonts/google_fonts.dart';
 
@@ -17,8 +19,9 @@ class McqScreen extends StatefulWidget {
 class _McqScreenState extends State<McqScreen> {
   //---------------method 1 & 2------------------
   List<String> selectedAnswers = [];
-  bool submited = false;
+  bool isSubmitted = false;
   List<Map<String, dynamic>> questions = [];
+  int total = 0;
 
   //---------------method 2------------------
   int currentQuestionIndex = 0;
@@ -30,7 +33,7 @@ class _McqScreenState extends State<McqScreen> {
     questions = widget.questions.map((question) {
       return {
         "question": question["question"],
-        "options": suffle(question["options"]),
+        "options": AppController.suffle(question["options"]),
         "answer": question["answer"],
       };
     }).toList();
@@ -47,14 +50,19 @@ class _McqScreenState extends State<McqScreen> {
           colorText: Colors.white);
       return;
     }
-    submited = true;
+    setState(() {
+      isSubmitted = true;
+    });
+    final answers = questions.map((e) => e['answer']).toList();
+    final c = selectedAnswers.where((element) => answers.contains(element));
+    total = c.length;
     setState(() {});
   }
 
   //---------------method 2------------------
   // void submit() async {
   //   if (currentQuestionIndex + 1 == questions.length) {
-  //     submited = true;
+  //     isSubmitted = true;
   //     final answers = questions.map((e) => e['answer']).toList();
   //     final c = selectedAnswers.where((element) => answers.contains(element));
   //     print(c);
@@ -91,16 +99,10 @@ class _McqScreenState extends State<McqScreen> {
   //   }
   // }
 
-  //---------------method 1 & 2------------------
-  List<String> suffle(List<String> list) {
-    List<String> shuffledList = List.from(list);
-    shuffledList.shuffle();
-    return shuffledList;
-  }
-
   @override
   Widget build(BuildContext context) {
     final ThemeController themeController = Get.put(ThemeController());
+    final bool isDark = themeController.isDark.value;
     return Scaffold(
       appBar: AppBar(
         title: Text("Exam - MCQ"),
@@ -124,9 +126,8 @@ class _McqScreenState extends State<McqScreen> {
                 'Taken by ${Get.put(UserController()).username}!',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: themeController.isDark.value
-                        ? Colors.white
-                        : Theme.of(context).primaryColor),
+                    color:
+                        isDark ? Colors.white : Theme.of(context).primaryColor),
               ),
             ),
             Divider(),
@@ -148,16 +149,24 @@ class _McqScreenState extends State<McqScreen> {
                       RadioListTile<String>(
                           value: i,
                           groupValue: selectedAnswers[index],
-                          tileColor: submited
+                          tileColor: isSubmitted
                               ? i == questions[index]['answer']
-                                  ? const Color.fromARGB(255, 164, 255, 167)
+                                  ? isDark
+                                      ? const Color.fromARGB(255, 0, 110, 4)
+                                      : const Color.fromARGB(255, 164, 255, 167)
                                   : i == selectedAnswers[index]
                                       ? selectedAnswers[index] ==
                                               questions[index]['answer']
-                                          ? const Color.fromARGB(
-                                              255, 164, 255, 167)
-                                          : const Color.fromARGB(
-                                              255, 255, 151, 144)
+                                          ? isDark
+                                              ? const Color.fromARGB(
+                                                  255, 0, 110, 4)
+                                              : const Color.fromARGB(
+                                                  255, 164, 255, 167)
+                                          : isDark
+                                              ? const Color.fromARGB(
+                                                  255, 128, 9, 0)
+                                              : const Color.fromARGB(
+                                                  255, 255, 151, 144)
                                       : null
                               : null,
                           title: Text(i),
@@ -172,10 +181,49 @@ class _McqScreenState extends State<McqScreen> {
               },
             ),
             ElevatedButton(
-              onPressed: submited ? null : submit,
+              onPressed: isSubmitted ? null : submit,
               child: Text('Submit'),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
+            if (isSubmitted)
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color.fromARGB(255, 159, 0, 122),
+                      const Color.fromARGB(255, 10, 0, 116),
+                    ],
+                    begin: Alignment(-1.0, 0.5),
+                    end: Alignment(0.5, 2.0),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Text(
+                      'Total Score: $total',
+                      style: GoogleFonts.roboto(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.back();
+                        },
+                        child: Text('Back To Home!'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            SizedBox(height: 20),
           ],
         ),
       ),
@@ -249,7 +297,7 @@ class _McqScreenState extends State<McqScreen> {
       //     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       //     color: Colors.transparent,
       //     child: ElevatedButton(
-      //       onPressed: submited ? null : submit,
+      //       onPressed: isSubmitted ? null : submit,
       //       child: Text(currentQuestionIndex + 1 == questions.length
       //           ? 'Submit'
       //           : 'Next'),
