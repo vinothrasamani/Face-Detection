@@ -235,8 +235,8 @@ class _MatchScreenState extends State<MatchScreen> {
                       const Color.fromARGB(255, 159, 0, 122),
                       const Color.fromARGB(255, 10, 0, 116),
                     ],
-                    begin: Alignment(-1.0, 0.5),
-                    end: Alignment(0.5, 2.0),
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
                 ),
                 child: Column(

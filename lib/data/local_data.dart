@@ -44,6 +44,10 @@ class LocalData {
       ],
     },
     {
+      'qus': ['Sun', 'Elephant', 'Earth', 'Rose', 'Carrot'],
+      'ans': ['Star', 'Herbivore', 'Planet', 'Flower', 'Vegetable'],
+    },
+    {
       'qus': [
         'Photosynthesis',
         'Shakespeare',
@@ -61,11 +65,30 @@ class LocalData {
     }
   ];
 
-  static const qus = [
-    'Describe the process of photosynthesis.',
-    'What are the major causes and effects of global warming?',
-    'Explain the significance of the Industrial Revolution.',
-    'How does the internet affect modern communication?',
-    'What are the advantages and disadvantages of Artificial Intelligence (AI)?',
-  ];
+  static const qus = {
+    'qus': [
+      'Describe the process of photosynthesis.',
+      'What are the major causes and effects of global warming?',
+      'Explain the significance of the Industrial Revolution.',
+      'How does the internet affect modern communication?',
+      'What are the advantages and disadvantages of Artificial Intelligence (AI)?'
+    ],
+    'ans': [
+      'Photosynthesis is the process by which plants make food using sunlight, water, and carbon dioxide.',
+      'The major causes of global warming include greenhouse gas emissions from human activities, deforestation, and industrial processes.',
+      'The Industrial Revolution marked a significant shift in technology, manufacturing, and societal changes, leading to advancements in transportation, communication, and urbanization.',
+      'The internet has revolutionized communication by enabling instant global connectivity, facilitating information sharing, and transforming the way people interact and conduct business.',
+      'Advantages of AI include automation, data analysis, and personalized experiences, while disadvantages include job displacement, ethical concerns, and potential biases.'
+    ]
+  };
+
+  static const fillInTheBlank = {
+    'questions': [
+      'The plural of "child" is __________.',
+      'A noun that represents a group of people or things is called a __________ noun.',
+      'He __________ (go) to school every day. (Fill in with the correct verb form)',
+      'World War II ended in the year __________.',
+    ],
+    'answers': ['children', 'collective', 'goes', '1945'],
+  };
 }

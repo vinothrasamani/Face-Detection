@@ -1,9 +1,11 @@
 import 'package:face_detection/controller/getx/theme_controller.dart';
 import 'package:face_detection/controller/getx/user_controller.dart';
 import 'package:face_detection/data/local_data.dart';
+import 'package:face_detection/screens/fill_in_the_blank_screen.dart';
 import 'package:face_detection/screens/login_screen.dart';
 import 'package:face_detection/screens/match_screen.dart';
 import 'package:face_detection/screens/mcq_screen.dart';
+import 'package:face_detection/screens/para_screen.dart';
 import 'package:face_detection/widgets/logo.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -174,8 +176,23 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => ParaScreen(
+                          questions: LocalData.qus,
+                        ));
+                  },
                   child: Text('Paragraph Typing', style: style),
+                ),
+              ),
+              SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.to(() => FillInTheBlankScreen(
+                        dataItems: LocalData.fillInTheBlank));
+                  },
+                  child: Text('Fill In The Blanks', style: style),
                 ),
               ),
               SizedBox(height: 15),
