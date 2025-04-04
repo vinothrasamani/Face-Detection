@@ -88,7 +88,16 @@ class LocalData {
       'A noun that represents a group of people or things is called a __________ noun.',
       'He __________ (go) to school every day. (Fill in with the correct verb form)',
       'World War II ended in the year __________.',
+      'The value of π (pi) is approximately __________.',
+      'An angle of 90 degrees is called a __________ angle.'
     ],
-    'answers': ['children', 'collective', 'goes', '1945'],
+    'answers': [
+      'children',
+      'collective',
+      'goes',
+      '1945',
+      '3.1416‖3.14',
+      'right'
+    ],
   };
 }

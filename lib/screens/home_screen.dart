@@ -1,17 +1,13 @@
 import 'package:face_detection/controller/getx/theme_controller.dart';
 import 'package:face_detection/controller/getx/user_controller.dart';
-import 'package:face_detection/data/local_data.dart';
-import 'package:face_detection/screens/fill_in_the_blank_screen.dart';
-import 'package:face_detection/screens/login_screen.dart';
-import 'package:face_detection/screens/match_screen.dart';
-import 'package:face_detection/screens/mcq_screen.dart';
-import 'package:face_detection/screens/para_screen.dart';
+import 'package:face_detection/widgets/editor.dart';
+import 'package:face_detection/widgets/exam.dart';
 import 'package:face_detection/widgets/logo.dart';
+import 'package:face_detection/widgets/menu.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:face_detection/controller/app_controller.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../services/camera_service.dart';
 import '../../services/face_detection_service.dart';
 import '../../services/database_service.dart';
@@ -28,10 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final FaceDetectionService _faceDetectionService = FaceDetectionService();
   final DatabaseService _databaseService = DatabaseService();
   List<Map<String, dynamic>> storedFaces = [];
-
-  TextStyle style = TextStyle(
-    fontWeight: FontWeight.bold,
-  );
+  int _currentIndex = 0;
 
   Future<void> registerFace(context) async {
     final image = await _cameraService.captureImage();
@@ -69,136 +62,35 @@ class _HomeScreenState extends State<HomeScreen> {
     final ThemeController themeController = Get.put(ThemeController());
     return Scaffold(
       appBar: AppBar(
-        title: Text('Smart Examiner!'),
+        title: Text(_currentIndex == 0 ? 'Smart Examiner!' : 'Math Editor!'),
         leading: Padding(
           padding: EdgeInsets.all(8.0),
           child: Logo(radius: 20),
         ),
-        actions: [
-          PopupMenuButton(
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 1,
-                height: 40,
-                onTap: () {
-                  themeController.changeTheme();
-                },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.dark_mode,
-                      color: Colors.grey,
-                    ),
-                    SizedBox(width: 4),
-                    Text('Dark Mode'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 2,
-                onTap: () {
-                  Get.offAll(() => LoginScreen());
-                },
-                height: 40,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.logout,
-                      color: Colors.grey,
-                    ),
-                    SizedBox(width: 4),
-                    Text('Logout'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(width: 8),
-        ],
+        actions: [Menu()],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 15),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  'Welcome ${Get.put(UserController()).username}!',
-                  style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: themeController.isDark.value
-                          ? Colors.white
-                          : Theme.of(context).primaryColor),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Test your Knowledge',
-                style: GoogleFonts.aboreto(
-                    fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              Image.network(
-                'https://img.freepik.com/premium-vector/online-exam-checklist-pencil-computer-monitor_153097-220.jpg',
-                width: double.infinity,
-                height: size.height * 0.35,
-                fit: BoxFit.fitWidth,
-              ),
-              SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.to(() => McqScreen(
-                          questions: LocalData.mcq,
-                        ));
-                  },
-                  child: Text('Choose the correct answer', style: style),
-                ),
-              ),
-              SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.to(() => MatchScreen(
-                          list: LocalData.mtf,
-                        ));
-                  },
-                  child: Text('Match the followings', style: style),
-                ),
-              ),
-              SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.to(() => ParaScreen(
-                          questions: LocalData.qus,
-                        ));
-                  },
-                  child: Text('Paragraph Typing', style: style),
-                ),
-              ),
-              SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.to(() => FillInTheBlankScreen(
-                        dataItems: LocalData.fillInTheBlank));
-                  },
-                  child: Text('Fill In The Blanks', style: style),
-                ),
-              ),
-              SizedBox(height: 15),
-            ],
-          ),
+          child: _currentIndex == 0
+              ? Exam(size: size, isDark: themeController.isDark.value)
+              : Editor(),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        currentIndex: _currentIndex,
+        onTap: (value) {
+          setState(() {
+            _currentIndex = value;
+          });
+        },
+        selectedItemColor: const Color.fromARGB(255, 73, 250, 63),
+        unselectedItemColor: const Color.fromARGB(255, 217, 217, 217),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Exam'),
+          BottomNavigationBarItem(icon: Icon(Icons.edit), label: 'Editor'),
+        ],
       ),
       floatingActionButton: storedFaces.isEmpty
           ? FloatingActionButton(

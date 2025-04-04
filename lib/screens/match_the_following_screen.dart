@@ -1,20 +1,18 @@
 import 'package:face_detection/controller/app_controller.dart';
-import 'package:face_detection/controller/getx/theme_controller.dart';
-import 'package:face_detection/controller/getx/user_controller.dart';
+import 'package:face_detection/widgets/taken_by.dart';
+import 'package:face_detection/widgets/total.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-class MatchScreen extends StatefulWidget {
-  const MatchScreen({super.key, required this.list});
+class MatchTheFollowingScreen extends StatefulWidget {
+  const MatchTheFollowingScreen({super.key, required this.list});
 
   final List<Map<String, dynamic>> list;
 
   @override
-  State<MatchScreen> createState() => _MatchScreenState();
+  State<MatchTheFollowingScreen> createState() => _MatchScreenState();
 }
 
-class _MatchScreenState extends State<MatchScreen> {
+class _MatchScreenState extends State<MatchTheFollowingScreen> {
   List<Map<String, dynamic>> suffledList = [];
   List<List<int>> selectedAnswers = [];
   List<int> successAnswers = [];
@@ -54,16 +52,14 @@ class _MatchScreenState extends State<MatchScreen> {
 
   void submit() {
     if (selectedAnswers.any((ans) => ans.isEmpty)) {
-      Get.snackbar('Required!', "Please answer all questions",
-          backgroundColor: const Color.fromARGB(255, 118, 8, 1),
-          colorText: Colors.white);
+      AppController.snackBar(context, 'Please answer all questions!',
+          purpose: Purpose.failure);
       return;
     }
     if (selectedAnswers
         .any((ans) => ans.length != suffledList[0]['qus'].length)) {
-      Get.snackbar('Required!', "Please match all options",
-          backgroundColor: const Color.fromARGB(255, 118, 8, 1),
-          colorText: Colors.white);
+      AppController.snackBar(context, 'Please verify all options are matched!',
+          purpose: Purpose.failure);
       return;
     }
     setState(() {
@@ -87,7 +83,6 @@ class _MatchScreenState extends State<MatchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeController themeController = Get.put(ThemeController());
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -97,24 +92,7 @@ class _MatchScreenState extends State<MatchScreen> {
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
           physics: AlwaysScrollableScrollPhysics(),
           children: [
-            SizedBox(height: 10),
-            ListTile(
-              contentPadding: EdgeInsets.symmetric(horizontal: 0),
-              leading: CircleAvatar(
-                radius: 28,
-                backgroundImage: NetworkImage(
-                    'https://i.pinimg.com/736x/ec/a2/68/eca268451638f69caf3256fa1ba678b9.jpg'),
-              ),
-              title: Text(
-                'Taken by ${Get.put(UserController()).username}!',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: themeController.isDark.value
-                        ? Colors.white
-                        : Theme.of(context).primaryColor),
-              ),
-            ),
-            Divider(),
+            TakenBy(),
             ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               itemCount: suffledList.length,
@@ -177,12 +155,16 @@ class _MatchScreenState extends State<MatchScreen> {
                       children: [
                         Container(
                           padding: EdgeInsets.symmetric(vertical: 10),
-                          width: size.width * 0.35,
+                          width: size.width * 0.3,
                           child: Text(
                             '${suffledList[index]['qus'].indexOf(i) + 1}. $i',
                             softWrap: true,
                           ),
                         ),
+                        SizedBox(width: 15),
+                        Text('-',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
                         SizedBox(width: 15),
                         Expanded(
                           child: GestureDetector(
@@ -225,44 +207,7 @@ class _MatchScreenState extends State<MatchScreen> {
               child: Text('Submit'),
             ),
             SizedBox(height: 20),
-            if (isSubmitted)
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color.fromARGB(255, 159, 0, 122),
-                      const Color.fromARGB(255, 10, 0, 116),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Text(
-                      'Total Score: $total',
-                      style: GoogleFonts.roboto(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        child: Text('Back To Home!'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (isSubmitted) Total(total: total),
             SizedBox(height: 20),
           ],
         ),

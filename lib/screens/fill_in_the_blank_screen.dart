@@ -1,5 +1,7 @@
+import 'package:face_detection/controller/app_controller.dart';
 import 'package:face_detection/controller/getx/theme_controller.dart';
-import 'package:face_detection/controller/getx/user_controller.dart';
+import 'package:face_detection/widgets/taken_by.dart';
+import 'package:face_detection/widgets/total.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,12 +22,42 @@ class _FillInTheBlankScreenState extends State<FillInTheBlankScreen> {
   List<bool> isCorrect = [];
 
   void submit() {
-    setState(() {
-      isSubmitted = true;
-    });
+    if (!answers.contains('')) {
+      for (int i = 0; i < answers.length; i++) {
+        if (widget.dataItems['answers']![i].contains('‖')) {
+          final answerArray =
+              widget.dataItems['answers']![i].trim().toLowerCase().split('‖');
+          bool isMatch = false;
+          for (var ans in answerArray) {
+            if (ans == answers[i].trim().toLowerCase()) {
+              isCorrect.add(true);
+              total++;
+              isMatch = true;
+            }
+          }
+          if (!isMatch) {
+            isCorrect.add(false);
+          }
+        } else {
+          if (answers[i].trim().toLowerCase() ==
+              widget.dataItems['answers']![i].trim().toLowerCase()) {
+            isCorrect.add(true);
+            total++;
+          } else {
+            isCorrect.add(false);
+          }
+        }
+      }
+      setState(() {
+        isSubmitted = true;
+      });
+    } else {
+      AppController.snackBar(context, 'Fill all the blanks!',
+          purpose: Purpose.failure);
+    }
   }
 
-  void enterAnswer(int index, String qus) async {
+  Future<void> enterAnswer(int index, String qus) async {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -40,11 +72,13 @@ class _FillInTheBlankScreenState extends State<FillInTheBlankScreen> {
             const SizedBox(height: 10),
             TextField(
               decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter your answer',
-                  hintStyle: TextStyle(fontSize: 11)),
+                border: OutlineInputBorder(),
+                hintText: 'Enter your answer',
+                hintStyle: TextStyle(fontSize: 13),
+              ),
               onChanged: (value) {
-                answers[index] = value;
+                answers[index] = value.trim();
+                setState(() {});
               },
             ),
           ],
@@ -65,15 +99,11 @@ class _FillInTheBlankScreenState extends State<FillInTheBlankScreen> {
         ],
       ),
     );
-    isCorrect[index] = answers[index] == widget.dataItems['answers']![index];
-    print(isCorrect);
-    setState(() {});
   }
 
   @override
   void initState() {
     answers = List.filled(widget.dataItems['questions']!.length, '');
-    isCorrect = List.filled(widget.dataItems['questions']!.length, false);
     super.initState();
   }
 
@@ -91,26 +121,9 @@ class _FillInTheBlankScreenState extends State<FillInTheBlankScreen> {
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
           physics: AlwaysScrollableScrollPhysics(),
           children: [
-            SizedBox(height: 10),
-            ListTile(
-              contentPadding: EdgeInsets.symmetric(horizontal: 0),
-              leading: CircleAvatar(
-                radius: 28,
-                backgroundImage: NetworkImage(
-                    'https://i.pinimg.com/736x/ec/a2/68/eca268451638f69caf3256fa1ba678b9.jpg'),
-              ),
-              title: Text(
-                'Taken by ${Get.put(UserController()).username}!',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: themeController.isDark.value
-                        ? Colors.white
-                        : Theme.of(context).primaryColor),
-              ),
-            ),
-            Divider(),
+            TakenBy(),
             Text(
-              'Questions',
+              'Questions :',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -143,8 +156,8 @@ class _FillInTheBlankScreenState extends State<FillInTheBlankScreen> {
                             child: GestureDetector(
                               onTap: isSubmitted
                                   ? null
-                                  : () {
-                                      enterAnswer(index, question);
+                                  : () async {
+                                      await enterAnswer(index, question);
                                     },
                               child: RichText(
                                 text: TextSpan(
@@ -159,9 +172,7 @@ class _FillInTheBlankScreenState extends State<FillInTheBlankScreen> {
                                           ? answers[index]
                                           : '__________',
                                       style: TextStyle(
-                                          fontWeight: !isSubmitted
-                                              ? FontWeight.bold
-                                              : FontWeight.normal,
+                                          fontWeight: FontWeight.bold,
                                           decoration: answers[index] != '' &&
                                                   !isSubmitted
                                               ? TextDecoration.underline
@@ -170,7 +181,9 @@ class _FillInTheBlankScreenState extends State<FillInTheBlankScreen> {
                                               ? isDark
                                                   ? Colors.white
                                                   : Colors.black
-                                              : Colors.green),
+                                              : isCorrect[index]
+                                                  ? Colors.green
+                                                  : Colors.red),
                                     ),
                                     TextSpan(text: questionParts[1]),
                                   ],
@@ -191,44 +204,7 @@ class _FillInTheBlankScreenState extends State<FillInTheBlankScreen> {
               child: Text('Submit'),
             ),
             SizedBox(height: 20),
-            if (isSubmitted)
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color.fromARGB(255, 159, 0, 122),
-                      const Color.fromARGB(255, 10, 0, 116),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Text(
-                      'Total Score: $total',
-                      style: GoogleFonts.roboto(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        child: Text('Back To Home!'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (isSubmitted) Total(total: total),
             SizedBox(height: 20),
           ],
         ),

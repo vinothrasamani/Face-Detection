@@ -1,0 +1,151 @@
+class FormulaData {
+  static const formulaSymbols = [
+    {
+      'arithmetic': [
+        r'+',
+        r'-',
+        r'\times',
+        r'\div',
+        r'=',
+        r'\neq',
+        r'<',
+        r'>',
+        r'\leq',
+        r'\geq',
+      ]
+    },
+    {
+      'algebra': [
+        r'x^2',
+        r'x^3',
+        r'\sqrt{x}',
+        r'\sqrt[3]{x}',
+        r'\sqrt[4]{x}',
+      ]
+    },
+    {
+      'function': [
+        r'\frac{1}{2}',
+        r'\frac{1}{3}',
+        r'x^n',
+        r'\frac{a}{b}',
+      ]
+    },
+    {
+      'trigonometry': [
+        r'\sin',
+        r'\cos',
+        r'\tan',
+        r'\cot',
+        r'\sec',
+        r'\csc',
+      ]
+    },
+    {
+      'calculus': [
+        r'\int',
+        r'\int_{a}^{b}',
+        r'\partial',
+        r'\frac{dx}{dy}',
+        r'\lim',
+      ]
+    },
+    {
+      'summation': [
+        r'\sum',
+        r'\prod',
+      ]
+    },
+    {
+      'sets': [
+        r'\in',
+        r'\notin',
+        r'\cap',
+        r'\cup',
+        r'\subseteq',
+        r'\forall',
+        r'\exists',
+      ]
+    },
+    {
+      'greek': [
+        r'\alpha',
+        r'\beta',
+        r'\gamma',
+        r'\Delta',
+        r'\theta',
+        r'\lambda',
+        r'\pi',
+        r'\sigma',
+        r'\Omega',
+      ]
+    },
+  ];
+
+  static const symbols = [
+    r'\sum',
+    r'\prod',
+    r'\{',
+    r'\}',
+    r'\int',
+    r'\int_{a}^{b}',
+    r'\partial',
+    r'x^2',
+    r'x^3',
+    r'\sqrt{x}',
+    r'\alpha',
+    r'\beta',
+    r'\gamma',
+    r'\delta',
+    r'\epsilon',
+    r'\zeta',
+    r'\eta',
+    r'\theta',
+    r'\iota',
+    r'\kappa',
+    r'\lambda',
+    r'\mu',
+    r'\nu',
+    r'\xi',
+    r'\pi',
+    r'\rho',
+    r'\sigma',
+    r'\tau',
+    r'\upsilon',
+    r'\phi',
+    r'\chi',
+    r'\psi',
+    r'\omega',
+    r'\Gamma',
+    r'\Delta',
+    r'\Theta',
+    r'\Lambda',
+    r'\Xi',
+    r'\Pi',
+    r'\Sigma',
+    r'\Upsilon',
+    r'\Phi',
+    r'\Psi',
+    r'\Omega',
+    r'\forall',
+    r'\exists',
+    r'\neg',
+    r'\rightarrow',
+    r'\leftarrow',
+    r'\leftrightarrow',
+    r'\Rightarrow',
+    r'\pm',
+  ];
+
+  static const common = [
+    '^',
+    '_',
+    '=',
+    '(',
+    ')',
+    '[',
+    ']',
+    ',',
+    '.',
+  ];
+}

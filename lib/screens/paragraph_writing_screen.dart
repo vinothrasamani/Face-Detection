@@ -1,20 +1,18 @@
-import 'package:face_detection/controller/getx/theme_controller.dart';
-import 'package:face_detection/controller/getx/user_controller.dart';
+import 'package:face_detection/widgets/taken_by.dart';
+import 'package:face_detection/widgets/total.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:string_similarity/string_similarity.dart';
 
-class ParaScreen extends StatefulWidget {
-  const ParaScreen({super.key, required this.questions});
+class ParagraphWritingScreen extends StatefulWidget {
+  const ParagraphWritingScreen({super.key, required this.questions});
 
   final Map<String, List<String>> questions;
 
   @override
-  State<ParaScreen> createState() => _ParaScreenState();
+  State<ParagraphWritingScreen> createState() => _ParaScreenState();
 }
 
-class _ParaScreenState extends State<ParaScreen> {
+class _ParaScreenState extends State<ParagraphWritingScreen> {
   final _key = GlobalKey<FormState>();
   bool isSubmitted = false;
   int total = 0;
@@ -56,7 +54,6 @@ class _ParaScreenState extends State<ParaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeController themeController = Get.put(ThemeController());
     return Scaffold(
       appBar: AppBar(
         title: Text('Paragraph Writing'),
@@ -66,24 +63,7 @@ class _ParaScreenState extends State<ParaScreen> {
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
           physics: AlwaysScrollableScrollPhysics(),
           children: [
-            SizedBox(height: 10),
-            ListTile(
-              contentPadding: EdgeInsets.symmetric(horizontal: 0),
-              leading: CircleAvatar(
-                radius: 28,
-                backgroundImage: NetworkImage(
-                    'https://i.pinimg.com/736x/ec/a2/68/eca268451638f69caf3256fa1ba678b9.jpg'),
-              ),
-              title: Text(
-                'Taken by ${Get.put(UserController()).username}!',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: themeController.isDark.value
-                        ? Colors.white
-                        : Theme.of(context).primaryColor),
-              ),
-            ),
-            Divider(),
+            TakenBy(),
             Form(
               key: _key,
               child: ListView.builder(
@@ -176,44 +156,7 @@ class _ParaScreenState extends State<ParaScreen> {
               child: Text('Submit'),
             ),
             SizedBox(height: 10),
-            if (isSubmitted)
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color.fromARGB(255, 159, 0, 122),
-                      const Color.fromARGB(255, 10, 0, 116),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Text(
-                      'Total Score: $total',
-                      style: GoogleFonts.roboto(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        child: Text('Back To Home!'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (isSubmitted) Total(total: total),
             if (isSubmitted) SizedBox(height: 20),
           ],
         ),

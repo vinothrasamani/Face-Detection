@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 16),
           filled: true,
-          fillColor: Colors.grey[300],
+          fillColor: const Color.fromARGB(255, 77, 77, 77),
         ),
         fontFamily: GoogleFonts.roboto().fontFamily,
       ),
